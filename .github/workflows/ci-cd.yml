@@ -95,6 +95,8 @@ jobs:
           TARGET_BRANCH: ${{ env.TARGET_BRANCH }}
         run: |
           set -euo pipefail
+          GITOPS_REPO="$(printf '%s' "$GITOPS_REPO" | tr -d '\r\n')"
+          GIT_TOKEN="$(printf '%s' "$GIT_TOKEN" | tr -d '\r\n')"
 
           # ---- Git identity & credentials
           git config --global user.name  "GitHub Actions"
