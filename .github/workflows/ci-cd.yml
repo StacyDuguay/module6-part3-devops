@@ -43,6 +43,10 @@ jobs:
             echo "No Dockerfile for ${{ matrix.service }} — skipping."
           fi
 
+      - name: Set lowercase owner
+        if: steps.check.outputs.build == 'true'
+        run: echo "OWNER_LC=${GITHUB_REPOSITORY_OWNER,,}" >> $GITHUB_ENV
+
       - name: Log in to GHCR
         if: steps.check.outputs.build == 'true'
         uses: docker/login-action@v3
@@ -62,8 +66,8 @@ jobs:
           context: ./${{ matrix.service }}
           push: true
           tags: |
-            ${{ env.REGISTRY }}/${{ github.repository_owner }}/${{ github.event.repository.name }}-${{ matrix.service }}:latest
-            ${{ env.REGISTRY }}/${{ github.repository_owner }}/${{ github.event.repository.name }}-${{ matrix.service }}:${{ github.sha }}
+            ${{ env.REGISTRY }}/${{ env.OWNER_LC }}/${{ github.event.repository.name }}-${{ matrix.service }}:latest
+            ${{ env.REGISTRY }}/${{ env.OWNER_LC }}/${{ github.event.repository.name }}-${{ matrix.service }}:${{ github.sha }}
           provenance: false
           sbom: false
 
@@ -77,11 +81,14 @@ jobs:
         with:
           fetch-depth: 0
 
+      - name: Set lowercase owner
+        run: echo "OWNER_LC=${GITHUB_REPOSITORY_OWNER,,}" >> $GITHUB_ENV
+
       - name: Update GitOps repository (handles empty repo)
         shell: bash
         env:
           REGISTRY: ${{ env.REGISTRY }}
-          OWNER: ${{ github.repository_owner }}
+          OWNER: ${{ env.OWNER_LC }}
           APP_REPO: ${{ github.event.repository.name }}
           GITOPS_REPO: ${{ secrets.GITOPS_REPO }}   # e.g., "yourname/your-gitops-repo"
           GIT_TOKEN: ${{ secrets.GITOPS_PAT }}      # PAT with repo scope
