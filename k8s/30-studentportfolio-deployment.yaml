@@ -19,7 +19,7 @@ spec:
         - name: ghcr-creds
       containers:
         - name: studentportfolio
-          image: ghcr.io/stacyduguay/module6-part3-devops:latest
+          image: ghcr.io/stacyduguay/module6-part3-devops-studentportfolio:latest
           imagePullPolicy: IfNotPresent
           ports:
             - name: http
